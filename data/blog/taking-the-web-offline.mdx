@@ -1,0 +1,56 @@
+---
+title: 'Taking the Web Offline'
+date: '2018-04-04'
+tags: ['front end', 'service workers', 'offline']
+draft: false
+authors: ['default']
+---
+
+This weekend I was excited to see the release of iOS 11.3 and with it the addition of Service Workers to Safari. As an iPhone owner, for the last year or so I've been staring green eyed at the strides that the web has been taking towards closer feature parity with native apps. Primarily the ability to handle offline. This may not seem like the most riveting leap but it has big benefits to user experiences with the web.
+
+### No internet = no web
+
+I think it's almost an implicit assumption as an end user that websites require an internet connection.
+
+<Figure 
+  src="/static/images/posts/web-offline/safari-offline.png"
+  alt="Mobile Safari - No internet"
+  caption="Mobile Safari - No internet" />
+
+When we have no internet connection and try to load a website, we're used to our browser telling us we can't. Our only option is to move (if possible) to somewhere with more signal. If the signal bar goes up we can try again, if not, tough luck.
+
+By contrast native apps can, and arguably should, work under all network conditions. This is because the lifecycle of a native app is fundamentally different to a standard web page.
+
+### Native app life cycle
+
+1. Find in store
+2. Download
+3. Install
+4. Open
+5. Use
+6. Close
+7. Delete
+
+As an end user to native apps we know we need an internet connection to perform the first two tasks above. We now have the assets that are needed to run some or all of the application so from that point on it is possible to open the app without a connection. Internet connection or no we therefore expect some level of useful experience. Anything from a working menu system to a fully functioning app.
+
+<Figure 
+  src="/static/images/posts/web-offline/docs-offline.png"
+  alt="Google Docs - No internet"
+  caption="Google Docs - No internet" />
+
+As you're using a native app, you're also given feedback about what features will and won't work under the current network conditions. Even as I write this blog post in my native iOS Google Docs app, I'm reaping the benefits of this assumption. The docs app has told me "no connection. You can still edit recent files or create new ones".
+
+### Web page lifecycle
+
+1. Request
+2. Response
+
+In comparison, a web page life cycle is much more simple. There's no download or install step on the web. Web pages and the assets they depend on are downloaded at the point of request with no guarantee from the browser that they will stick around beyond the life of the browsing session.
+
+Service workers crucially introduce more lifecycle steps to a web experience. When a user requests a web page, a service worker can be installed on a users device. It sits outside of the regular request response cycle of the web and, once installed, all network requests for a site will be routed through it. The service worker can then choose to retrieve assets from the network or serve them instead from a local cache. Service workers can therefore circumvent the need for an internet connection to access a web page.
+
+I've been using a few sites that I know have service workers: [twitter.com](https://twitter.com), [Resilient Web Design](https://resilientwebdesign.com/), [React HN](https://react-hn.appspot.com/#/?_k=gouehi), [SVGOMG](https://jakearchibald.github.io/svgomg/). As soon as you've accessed these sites on a browser with Service Workers, if you switch off your internet connection you can later still access them. Interestingly however, only one of the pages explicitly told me that I could do this: SVGOMG which is unsurprisingly made by Jake Archibald one of the original spec creators of Service Workers.
+
+The key to the success of service workers in my opinion is whether we as developers of the web can change people's perception of when websites do and don't work. Can we break the assumption that no internet = no web? For the meantime I think we need to explicitly tell users when the pages they're accessing can be accessed offline. Doing this enough will hopefully build an expectation in our users that the web works without an internet connection.
+
+I'm excited to begin taking the web projects I work on offline with Service Workers and will be starting with this blog, Drum Machine and a few other project ideas I have.

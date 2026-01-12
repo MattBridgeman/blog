@@ -1,0 +1,95 @@
+---
+title: 'React Tech Geek Out'
+date: '2017-09-05'
+tags: ['front end', 'react', 'js']
+draft: false
+authors: ['default']
+---
+
+At my current company we have a weekly meeting called "Tech Geek Out". It's basically an opportunity to geek out about new technologies that we are excited about and this week I decided to put together a presentation of React.
+
+Initially I was thinking of making slides but (IMO) React is better presented through live demos. Here's a summary of the demo's I put together and why I think React is awesome!
+
+### The DOM Sucks
+
+<p data-height="265" data-theme-id="0" data-slug-hash="BdEZoB" data-default-tab="js,result" data-user="matt_bridgeman" data-embed-version="2" data-pen-title="React TGO - The DOM Sucks" class="codepen">See the Pen <a href="https://codepen.io/matt_bridgeman/pen/BdEZoB/">React TGO - The DOM Sucks</a> by Matthew Bridgeman (<a href="https://codepen.io/matt_bridgeman">@matt_bridgeman</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+
+Notes:
+
+* The DOM (Document Object Model) is an API for manipulating HTML via JavaScript
+* It sucks but it's not immediately obvious why
+* Here's a "Hello World" example for generating HTML using the DOM
+* The API methods used are:
+  * createElement
+  * innerHTML
+  * appendChild
+  * getElementById
+
+### React Hello World
+
+<p data-height="265" data-theme-id="0" data-slug-hash="KvBWaq" data-default-tab="js,result" data-user="matt_bridgeman" data-embed-version="2" data-pen-title="React TGO - Hello World" class="codepen">See the Pen <a href="https://codepen.io/matt_bridgeman/pen/KvBWaq/">React TGO - Hello World</a> by Matthew Bridgeman (<a href="https://codepen.io/matt_bridgeman">@matt_bridgeman</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+
+Notes:
+
+* The equivalent React app just uses two methods
+  * createElement
+  * ReactDOM.render
+* This may look a little verbose to you
+* It did to the creators of React so they created a new syntax called JSX
+
+### JSX Hello World
+
+<p data-height="265" data-theme-id="0" data-slug-hash="XaQgVE" data-default-tab="js,result" data-user="matt_bridgeman" data-embed-version="2" data-pen-title="React TGO - Hello World Pt 2" class="codepen">See the Pen <a href="https://codepen.io/matt_bridgeman/pen/XaQgVE/">React TGO - Hello World Pt 2</a> by Matthew Bridgeman (<a href="https://codepen.io/matt_bridgeman">@matt_bridgeman</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+
+Notes:
+
+* JSX just looks like this
+* It's simply a way of writing HTML style syntax that can be transformed into React elements
+* This means that the JSX Hello World example compiles to the same code as the React Hello World example
+
+### DOM Menu
+
+<p data-height="265" data-theme-id="0" data-slug-hash="LjvLbJ" data-default-tab="js,result" data-user="matt_bridgeman" data-embed-version="2" data-pen-title="React TGO - The DOM - Making a menu" class="codepen">See the Pen <a href="https://codepen.io/matt_bridgeman/pen/LjvLbJ/">React TGO - The DOM - Making a menu</a> by Matthew Bridgeman (<a href="https://codepen.io/matt_bridgeman">@matt_bridgeman</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+
+Notes:
+
+* You quickly notice the difficulties with the DOM when working on non-trivial examples
+* This example generates a menu from an array of menu items
+* There are 4 separate steps:
+  * Create the unordered list
+  * create the list items
+  * Append the list items to the ul
+  * Append the list to the app div
+* It's a one time hit so if you want to change any of the menu items, you need separate operations to do that
+
+### React Menu
+
+<p data-height="265" data-theme-id="0" data-slug-hash="mMgwvJ" data-default-tab="js,result" data-user="matt_bridgeman" data-embed-version="2" data-pen-title="React TGO -  Making a menu" class="codepen">See the Pen <a href="https://codepen.io/matt_bridgeman/pen/mMgwvJ/">React TGO -  Making a menu</a> by Matthew Bridgeman (<a href="https://codepen.io/matt_bridgeman">@matt_bridgeman</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+
+Notes:
+
+* In contrast the React equivalent is much more simple
+* The "Menu" component takes a list of items in the props argument
+* From that it creates an unordered list
+* The "Application" component simply calls the "Menu" component with the items it wants to pass down
+
+### React TODO App
+
+<p data-height="265" data-theme-id="0" data-slug-hash="ayxyLe" data-default-tab="js,result" data-user="matt_bridgeman" data-embed-version="2" data-pen-title="React TGO -  Making a TODO list" class="codepen">See the Pen <a href="https://codepen.io/matt_bridgeman/pen/ayxyLe/">React TGO -  Making a TODO list</a> by Matthew Bridgeman (<a href="https://codepen.io/matt_bridgeman">@matt_bridgeman</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+
+Notes:
+
+* The final example is a TODO list app
+* Here the "Application" component is an ES6 class
+* The benefit of this is that you can manage the component's lifecycle
+* The class's "state" property can be manipulated via the `setState` method
+* The class's initial state is set in the class constructor
+* When `setState` is called it triggers a re-render of the component
+* This means to add a new item all you have to do is call `setState` and update the `items` property
+* To delete an item, I simply call `setState` and filter out the id I no longer want
+
+### Conclusion
+
+I love React because it just helps you update the DOM. At its heart, React components are either functions or classes. They take arguments via props and return React elements which React can then diff against the current state of the DOM, making any changes necessary. How you structure the rest of your JS is really up to you.
+
+<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script>

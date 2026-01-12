@@ -1,0 +1,59 @@
+---
+title: 'React Native and native apps'
+date: '2019-05-30'
+tags: ['native', 'react']
+draft: false
+authors: ['default']
+---
+
+As part of a hack day at my workplace, we were tasked with creating a compelling native app experience using React Native. It was my first chance to try out React Native so I thought I'd share my experience.
+
+### First thoughts
+
+Just like web-based React, you write React Native in JSX, an XML style syntax which compiles to Javascript. Given that the syntax is identical, many popular React libraries have written React Native ports. For example, you can set up routing with React Router and use Redux in very much the same fashion as in a "normal" React app.
+
+``` javascript
+const App = () => {
+  return (
+    <Provider store={store}>
+      <ConnectedRouter history={history}>
+        <Switch>
+          <Route exact path="/" component={PathComponent} />
+          <Route exact path="/path-2" component={Path2Component} />
+          <Route component={DefaultPathComponent} />
+        </Switch>
+      </ConnectedRouter>
+    </Provider>
+  );
+};
+
+export default App;
+```
+
+There's no getting around needing some knowledge of Xcode / Android Studio and native app development but React Native and the Create React Native App project make this challenge much less intimidating.
+
+### CRNA is awesome
+
+Provided that you have Xcode, Android Studio and a few other common CLI tools, all you need to get up and running is a `yarn install` or `npm install`.
+
+It comes with Metro Bundler which, when running the app in debug mode, allows you to hot reload your app by shaking your device. Any changes you've made to your project since the last time you performed a build automatically get synced into the app without having to perform lengthy builds in Xcode (a problem I associate with traditional native app development).
+
+In some instances you do need to perform another build via either command line or Xcode. If, for instance, you add another library or import something which you had not previously used. Although slightly tedious, on the whole the workflow massively speeds the process of building UIs.
+
+### Improvements in native app dev
+
+App development as a whole seems much less intimidating than when I tried 5 or 6 years ago. My previous experience of trying to build and run apps largely consisted of staring at an Xcode screen full of build errors while scratching my head. Another issue in the past was the pain of trying to deploy an app to a phone. You had to pay for a full year developer licence and mess around with creating certificates before deploying to your phone was possible. A process that I never truly got to grips with.
+
+Now you can simply sign into your Apple account in Xcode and it will provision you a certificate. Then you simply:
+1. Connect your phone to your laptop
+2. Build your app "targeting" your phone
+3. "Trust" the developer and the app on the phone-side
+4. Boom! You can have a fully fledged app running on your phone!
+
+### "Whiplash development"
+
+I once heard Ryan Florence describe switching from the Ember framework to a custom stack as "whiplash development". You get used to developing at a certain speed and then when a different workflow suddenly slows you down you experience a pain like whiplash. This feeling I feel applies to going from React Native to the Xcode config editing side of app development.
+
+This can happen when what you're building requires a lot of native code. The abstractions of React Native tend to get stretched. For example, I took a look at implementing the React Native Maps module but found myself quickly in the territory of installing cocoapods, updating platform specific configuration files and running tasks in Xcode and Android Studio. This feels kind of against the spirit React Native. Perhaps tooling in the future will make this a little more seamless.
+
+But on the whole it's been a very positive experience and has definitely given me the bug to try more!

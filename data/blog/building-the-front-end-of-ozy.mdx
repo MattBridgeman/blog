@@ -1,0 +1,114 @@
+---
+title: 'Building the front end of Ozy.com'
+date: '2015-07-27'
+tags: []
+draft: false
+authors: ['default']
+---
+
+Over the last few years at Abacus I've had the good fortune of helping develop the front end of [Ozy.com](http://www.ozy.com). Ozy are a Californian start up who focus on creating news content about the new and the next with some big name backers like Laurene Powell-Jobs. They also feature high-profile interviews with the likes of Bill Gates and Bill Clinton. This week, Ozy was the feature of [Ethan Marcotte's Responsive Web Design podcast](http://responsivewebdesign.com/podcast/ozy.html) so I thought I'd follow up with a look at some of the technical obstacles we hit on the front end and how we solved them.
+
+### Tailored designs for 7 major breakpoints
+
+From the offset of the Ozy project, the design vision has always been to give users a tailored experience regardless of screen size. Responsive web design was therefore an easy choice, however the design team wanted to push the boundaries beyond 3-4 breakpoints (the average amount of breakpoints at the time) and instead have 7 major break points. These breakpoints are as follows:
+
+  * mobile – 320px
+  * mobile landscape – 480px
+  * tablet portrait – 768px
+  * tablet landscape – 1024px
+  * desktop – 1280px
+  * desktop 'medium' – 1440px
+  * desktop 'large' – 1600px
+
+Across these different breakpoints you also have 3 different grid systems, again to make sure the design is tailored to the user's device as much as possible. This presented a number of hurdles to overcome in the front end build.
+
+### Maintenance
+
+The first issue was simply maintenance. We wanted multiple developers to be able to build features as fast as possible across the various breakpoints and grid systems without them becoming a burden during the build and in the future should we want to tweak them.
+
+### Mobile first
+
+With this in mind, the first choice we made was to go mobile first, which is to build the mobile CSS and use min-width breakpoints to slowly introduce more complexity to the design for bigger screen sizes. Using LESS as our CSS preprocessor of choice we devised a strategy to make it easy to scale the breakpoints and grid systems across multiple modules using variables and mixins:
+
+Breakpoint variables file
+
+
+``` css
+@tablet-portrait: 768px;
+@break-tablet-portrait: ~"screen and (min-width: @{tablet-portrait});
+
+.break-tablet-portrait(@rules) {
+    @media @break-tablet-portrait {
+        @import 'tablet-grid-variables.less';
+        @rules();
+    }
+}
+```
+
+Tablet grid variables file
+
+
+``` css
+@column-width: 45;
+@gutter-width: 18;
+@columns: 12;
+@outergutter: 15;
+
+@gridsystem-width: (@column-width*@columns) + (@gutter-width*(@columns - 1)) * 1px;
+```
+
+Grid helper mixin file
+
+
+``` css
+.column(@x) {
+    width: @total-width*((((@gutter-width+@column-width)*@x)-@gutter-width) / @gridsystem-width);
+}
+```
+
+By importing breakpoint specific grid variables inside of each breakpoint mixin, it allows you to create a one to many relationship between the grid helper mixins and the underlying grid systems, which really helps extensibility.
+
+The end result is you are able to write lots of separate module files and reference only a handful mixins which abstract the complexity of the underlying breakpoints and grid systems:
+
+### Module file
+
+
+``` css
+.break-tablet-portrait({
+   .my-module {
+       .column(4); //module spans 4 of the 12 available columns
+   }
+});
+```
+
+### Responsive images
+
+Another obstacle we found when working with such a large array of screen sizes is responsive images. Most of the pages on Ozy.com do not have edges, which means that any given full width image can span anywhere from 320px up to 2000px. To deal with this we also took a mobile first approach. Essentially each page loads with a set of mobile images by default. Once the page has loaded we use JavaScript to detect the user's screen size and load bigger images if necessary using data attributes on the image tags.
+
+``` html
+<img src="mobile-image.png" data-image-tablet="768x500" />
+```
+
+Using this approach all users get the mobile image, tablet and up get the tablet image later in the timeline of the page load. This has a couple of advantages. Firstly the HTML that makes up the initial page load is sufficient to render a usable experience regardless of screen size. The bigger image sizes can therefore be seen as a progressive enhancement on top of this with low powered low bandwidth mobile devices not neededing to parse and execute JavaScript to render images.
+
+### Infinite scroll
+
+Another big challenge when building the front end was that the article page has an infinite scroll feature. Once you reach the end of any article page you will be recommended a further four articles to read based on the content of the current article. The first article in the list of recommendations is automatically appended to the bottom of the page. As you scroll to the next page, the URL switches to the new article and a JavaScript event is fired triggering various actions such as tracking analytics and reattaching JS to the new HTML.
+
+The biggest issue we came across is that a lot of devices simply couldn't handle the demand of rendering 2 pages worth of HTML, namely iOS 7 and older IEs. On these devices and browsers we switched off infinite scroll, however these users still have access to the same content via the recommendations panel.
+
+### SVG
+
+The Ozy site has lots of iconography for symbols like menu and social buttons. The site caters for devices with lots of different pixel ratios so high resolution vector iconography is crucial. We found SVG to be a great fit for iconography as it's supported in the vast majority of browsers. IE8 is the only browser Ozy supports that doesn't support SVG, to which we serve a PNG fallback. To make the iconography workflow as simple as possible we use the Grunt SVG sprite task. It takes a folder of source SVG files, builds you an SVG sprite and generates a CSS file with class names for each source file. For example if you have an icon by the name of 'menu.svg', to use it on the site you would write the following:
+
+``` html
+<span class="ozy-icon i-menu"></span>
+```
+
+Having this automated as part of the grunt workflow means that it's easy to add new SVG files without breaking the background position of existing icons within the sprite. A benefit of having all of the icons declared within the HTML is that it's easy to combine multiple icons to create a compound icon for animations. This gives you the granularity to transform each layer separately and create really performant animations by reducing the layout and paint work the browser needs to do.
+
+### Testing testing testing
+
+Ozy.com really pushes the boundaries in terms of responsive design complexity and would not have been possible without a large amount of effort spent by the testing department and everyone involved in the project testing the pages across a multitude of browsers and devices. In the process we discovered lots of quirks not just with how pages are rendered but also in the implementation of APIs like local storage. These issues can really detract from a user's experience if left uncaught so testing effort has proven key to a successful responsive web design.
+
+Check out the site: [Ozy.com](http://www.ozy.com)

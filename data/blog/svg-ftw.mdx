@@ -1,0 +1,84 @@
+---
+title: 'SVG FTW'
+date: '2014-12-10'
+tags: ['Retina', 'SVG', 'Web standards']
+draft: false
+authors: ['default']
+---
+
+SVG is a web standard that's widely implemented and under appreciated. With the proliferation of 'retina' devices and the subsequent web traffic they bring, the need for scalable vector graphics has never been greater. Despite this, other arguably less appropriate solutions such as icon fonts have become the industry standard.
+
+I'm a huge believer that SVG is the future of vector graphics on the web and here's why.
+
+### Browser support
+
+SVG has been around for some time now with a usable level of support in IE9+, Chrome, Firefox and Safari. I would argue that the only browser with a reasonable market share that doesn't support SVG is IE8, however it's easy to create a fallback.
+
+### Ease of implementation
+
+You can implement an SVG sprite with just a couple lines of code:
+
+``` css
+.icon {
+    background: url(/path/to/sprite.svg) no-repeat;
+}
+.icon.menu {
+    background-position: 0 -50px;
+    height: 50px;
+    width: 50px;
+}
+```
+    
+
+And if you want to support non-SVG browsers, simply drop in modernizr (or your own feature test) and add the following line:
+
+``` css
+.no-svg .icon {
+    background-image: url(/path/to/sprite.png);
+}
+```
+    
+### Versatile
+
+If bootstrap-esque markup is your thing, you can add HTML to your page to make your icons appear, otherwise if super-syntactic markup is your thing, you can add image references to preexisting markup with CSS.
+
+### Multi-colour
+
+Whilst UI iconography can often be represented in one colour, logos and other vector imagery you have on your site often has more than one colour. SVGs handle this with ease.
+
+### Inline or in CSS
+
+My above example showed you how to embed an SVG in CSS, however you can also use SVG inline either through the image tag or an SVG element.
+
+### Scalable
+
+Whilst this one may sound obvious, it's something you just can't do with an icon font. In a responsive design, often you want a piece of iconography to 'fill' a certain area of a page. With SVG this is simple:
+
+HTML
+
+``` html
+<div class="area-to-fill">
+    <span class="icon menu"></span>
+</div>
+```
+
+CSS
+
+``` css
+.area-to-fill .icon.menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-size: contain;
+}
+```
+    
+### Designer friendly
+
+Whatever your designer's software of choice is (Illustrator, Photoshop), if it can create vector graphics it will have an option to output SVG. This means that if your workflow already involves your designer handing over image assets, the process of switching to SVG is minimal.
+
+### Conclusions
+
+SVG is the future of scalable vector graphics on the web and I'm looking forward to more developers seeing the benefits that they bring.

@@ -1,0 +1,32 @@
+---
+title: 'From DO to AWS in 280 days'
+date: '2021-08-21'
+tags: ['digital ocean', 'aws']
+draft: false
+authors: ['default']
+---
+
+After 280 days of an invalid Let's Encrypt cert sitting on my site and blocking the 10s of individuals interested in viewing it I finally took the plunge and migrated the site away from Digital Ocean.
+
+I've been using Digital Ocean for quite a while now. At the time I adopted it, it was a very un-intimidating way of hosting. And inexpensive too - £5 a month for the 512mb, SSD and for EU based hosting compared to the "Wordpress shared host" style equivalents at the time was fantastic!
+
+However over time the site has shrunk in complexity. Initially it was a Wordpress hosted site with a varnish caching layer, PHP FPM and all sorts of other weird and wonderful addons. Then I migrated content to Jekyll and configured a hook to redeploy the site with a simple Nginx layer in front of it.
+
+But despite the reduction in complexity, it's not been without its problems. For one, the droplet was running Ubuntu 12, and as I alluded to earlier, my integration with Let's Encrypt failed a lot... Almost monthly.
+
+In November of last year I decided enough was enough, I was not going to fix my Let's Encrypt integration again and instead I would work on an AWS "serverless" solution.
+
+I went through a few thought patterns of how I might design the solution. I knew that, given the site is essentially static, S3 would be the best place to host the site files. Initially I looked at the S3 static site hosting option, which is most likely the simplest integration, but I wanted a couple extra features I knew would be possible / easier with a few extra components. 
+
+Those being:
+- SSL
+- CDN distributed content
+- Option to add server side logic (I'm thinking mostly forms)
+
+Looking into Cloudfront I saw that the pricing tiers for traffic as low as mine are very good, it's all traffic based, no minimum spend. So the final design is.
+
+R53 -> Cloudfront -> S3 bucket
+
+And I have a Code Build integration to retrieve the site assets from a private bitbucket repo where I store the site / posts, perform a Jekyll build and push to S3.
+
+And there you have it. A mere 280 days of downtime later, I now have an entirely serverless, geo distributed, on demand price based website.

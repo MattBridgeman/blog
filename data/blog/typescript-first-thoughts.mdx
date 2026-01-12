@@ -1,0 +1,102 @@
+---
+title: 'TypeScript: First thoughts'
+date: '2014-12-11'
+tags: ['ES6', 'JavaScript', 'Polyfills', 'TypeScript', 'Visual Studio']
+draft: false
+authors: ['default']
+---
+
+A fellow front end developer at Abacus sent me Anders Hejlsberg's Google talk: ['Evolving JavaScript with TypeScript'](https://www.youtube.com/watch?v=Ut694dsIa8w). The video is fairly in depth at 1 hour in length and it speaks volumes about the philosophy behind TypeScript: progressively improving the quality of your JavaScript.
+
+### What is TypeScript?
+
+For those that don't know, TypeScript is essentially a precompiler for JavaScript, which allows you to add syntactic sugar to your JS. At a base level TypeScript can be run against your JavaScript with a single command line: `tsc yourfile.ts`. Before watching the video, I had preconceptions that TypeScript would be an all or nothing approach where your entire code base and its dependencies would need to be strongly typed for your code to pass through the compiler. As it turns out you can simply rename your `.js` files to `.ts` and run the compile command in your command line. This means there isn't a huge upfront time investment in implementing TypeScript into an existing code base. Instead, over time you can gradually add types, interfaces and other TypeScript features gaining benefits as you go.
+
+### Adapting to an existing code base
+
+At my current work place we maintain a couple JavaScript code bases probably combining to 10,000+ lines of code. It's worth mentioning this because the time investment of refactoring a code base of even a modest size that has been tested and successfully deployed time and time again can prove daunting. Arguably much of the risk of refactoring a code base should be mitigated through an automated test suite, however for JavaScript code bases this is quite a new concept and whilst our code base has been through a large amount of QA, no automated tests currently exist. I aim to rectify this with a Selenium test suite, which I will cover in a later post but testing aside, TypeScript fits into our existing workflow very nicely:
+
+### Current Code
+
+``` javascript
+(function($, window, document){
+    
+    Abacus.AccountDropdown = new Class({
+
+        options: {
+            header: 'h2',
+            selector: 'ul'
+        },
+        
+        initialize: function(element, options){
+            this.element = $(element);
+            this.setOptions(options);
+        },
+        
+        setUpEvents: function(){
+            var self = this;
+            this.header.on('click', function(){
+                self.toggleMenu();
+            });
+        },
+
+        ...
+        
+    });
+    
+})(AbacusjQuery, window, document);
+```
+
+### TypeScript Code
+
+``` javascript
+module Abacus {
+
+    var $ = AbacusjQuery;
+    var window: Window = window;
+    var document: Document = document;
+
+    export class AccountDropdown extends Abacus.Class {
+
+        options = {
+            header: 'h2',
+            selector: 'ul'
+        };
+        element: JQuery;
+
+        constructor(element: Element, options?: any) {
+            super();
+            this.element = $(element);
+            this.setOptions(options);
+        }
+
+        setUpEvents(): void {
+            var self = this;
+            this.header.on('click', function () {
+                self.toggleMenu();
+            });
+        }
+
+        ...
+
+    }
+}
+```
+
+On the face of it, not a whole lot has changed, but there are some very powerful tools at play.
+
+### ES6 Classes
+
+One of the great things about TypeScript is that not only does it add additional type syntax to JS, it also polyfills future features that haven't yet made it to the browser. One of those features is ES6 classes. For a long time, it's been possible to create psuedo classes in JavaScript with functions and their prototypes, so ES6 adds class syntax to make the process a little less verbose. With TypeScript you can use future syntax, which compiles down to your choice of either ES5 or ES3 compliant code.
+
+### ES6 Modules
+
+Defining and extending modules in JavaScript is possible today but much like classes, ends up with verbose code. By declaring module blocks in TypeScript, there's no need to manually check for the presence of a given global variable prior to your declaration. You also gain the ability to make members of that module public or private by optionally adding 'export' statements to a module's variables.
+
+### Tooling
+
+Equally valuable as it's ability to polyfill is TypeScript's impressive set of tooling. At its base level TypeScript is run with a single command line: `tsc`. This means that integration into grunt and other taskrunner workflows is simple. Beyond that Microsoft have developed strong integration with the now open source Visual Studio 2013. The knowledge that TypeScript builds up about your code base through types is fed back to you as you're typing in the form of syntax and type errors, as well as highlighting lots of potential runtime errors. There are also type declarations for pretty much every popular JS library and framework. In the above example it means that by declaring a variable as type JQuery I am prompted with intellisense for the various possible methods available and the arguments they take.
+
+### Conclusions
+
+I think TypeScript has the potential to radically change the way we think of writing JavaScript. My historical workflow with JS has been regular trips to the browser to check what's working and what throws errors. What we initially did with console.log statements we swapped for debug console catches and so moving (some) error handling to the IDE feels like the next natural step in efficiently creating and maintaining JavaScript code bases. If you're interested in learning more about TypeScript I strongly recommend you watch [Anders Hejlsberg's talk](https://www.youtube.com/watch?v=Ut694dsIa8w).

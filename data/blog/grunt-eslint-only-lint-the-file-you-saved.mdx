@@ -1,0 +1,46 @@
+---
+title: 'Grunt ESLint: Only lint the file you saved'
+date: '2015-10-16'
+tags: []
+draft: false
+authors: ['default']
+---
+
+I love Grunt. For creating simple build steps, it's configuration feels neat and intuitive. One of my favourite Grunt features, as part of my development workflow, is to watch for file changes and trigger certain portions of the build process, e.g. if a LESS file changes, recompile all CSS. This works great for many use cases however for tasks like linting where the command line output is quite verbose, linting all JavaScript files means it can be difficult to get useful information out. Ideally in this instance you just want to lint the file you saved.
+
+### Solution
+
+I found a solution at the bottom of the [Grunt Mocha GitHub page](https://github.com/pghalliday/grunt-mocha-test).
+
+Essentially grunt emits events when watch tasks are triggered. You can hook onto this and manipulate the target files for a given task to point at just the one that's been saved. To do this you set up your lint and watch tasks as you would normally:
+
+``` javascript
+watch: {
+   lint: {
+      files: ['src/**/*.@(js|jsx)'],
+      tasks: ['eslint']
+   }
+}
+...
+eslint: {
+   target: ['src/js/']
+}
+```
+
+Then set up an event to listen out for watch tasks:
+
+``` javascript
+var defaultLintSrc = grunt.config('eslint.target');
+grunt.event.on('watch', function(action, filepath) {
+   grunt.config('eslint.target', defaultLintSrc);
+   if (grunt.file.isMatch('src/js/**/*.@(js|jsx)', filepath)) {
+      grunt.config('eslint.target', filepath);
+   }
+});
+```
+
+Because there can be multiple watch sub-tasks it's important to make sure the file matches the desired path glob pattern. This is handled by the `grunt.file.isMatch` line.
+
+Then all you have to do in the command line is run: `grunt watch`, change a JS file and you should find only that file is linted.
+
+There's probably a more elegant way of writing this and it feels like a bit of a hack to mutate the grunt settings in memory but it gets the job done.

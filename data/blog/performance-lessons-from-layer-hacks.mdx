@@ -1,0 +1,37 @@
+---
+title: 'Performance lessons from layer hacks'
+date: '2015-04-29'
+tags: []
+draft: false
+authors: ['default']
+---
+
+Recently I've been working on a project where we have been implementing lots of animated hover states and other fancy effects by applying CSS3 transitions to transform and opacity properties. If you've followed Paul Lewis's work on web page performance you'll know that the key to keeping browser frame rates high whilst animating portions of the page is to make the browser do as little work as possible.
+
+Whilst this sounds obvious, without knowledge of the most performant animation techniques it can be very easy to inadvertently force the browser to do much more work than is necessary. When a CSS property changes on a page, the browser has to do one or more of the following tasks: recalculate style (work out what CSS changed), update the layer tree (determine the visible elements of the page that may need changing), layout (work out geometry changes to the page), paint (redraw areas of the page that have changed) and finally composite layers (meld the separate layers into one layer ready to render). Changing elements like 'top' can cause all of the above to happen whereas changing transform or opacity properties only cause the last step to occur providing that the element you wish to apply this change to has its own layer.
+
+Therefore the only way to guarantee a performant animation is to promote the element in question to a new layer ahead of time and only animate transforms and opacities. The means we have to do this are effectively hacks. Browsers have rules under which elements are promoted to new layers such as a when 3D transformation, or backface-visiblity: hidden; are applied.
+
+Given all this, we chose to promote all elements that had animations to new layers using these hacks. We had about 100 elements on the page that we forced to be rendered on a separate layer. Testing on Safari iOS7 on an iPad, frame rates were nice and high and the page was rendering smoothly. What we did notice though was that if you scrolled relatively quickly or rotated the iPad it would regularly crash. It took us a while to track down the cause of the crashing but when we plugged the iPad into a Mac to debug we noticed a couple glaring issues. 
+
+### Memory consumption
+
+Firstly memory usage sky rockets when new layers are created. The crash reports on the iPad indicated that Safari was consistently crashing with 'out of memory' messages so immediately the number of layers we had created were highlighted as an issue.
+
+### Creation of extra layers
+
+Secondly, we learnt that a layer is created for every element that sits ontop of a promoted layer. Since each hover effect that was triggered also had ~3 other elements sat ontop of it, by creating 100 layers we had inadvertently created 400 layers.
+
+### Solution: less layer hacks
+
+By reducing the number of layers on the page to about 100, we managed to prevent the iPad from crashing. This does lead to more paint operations happening and slower animations but the trade off isn't too bad.
+
+### iOS8 is better
+
+What's noticeable is that iOS8 only promotes elements to new layers when animations are active. On iOS8 our page layer count idles at about 40 and rises to ~200 when animations are in progress. This hugely reduces overall memory consumption and to date we have not seen an iPad running iOS8 crash on our site.
+
+### Conclusions
+
+Whilst I have seen general advise about not overusing layer promotion hacks, I've never seen quantifiable proof of the tipping point for different devices. The tipping point we found for iPads running iOS7, given our page layout, was that 100 layers was a safe maximum to aim for.
+
+Beyond that the tipping point we've seen for the usefulness of layer hacks is when time spent compositing the different layers you've promoted pushes frame rates beyond a smooth 60 FPS. At this point it's time to assess what elements you have on the page and what HTML you can start shedding.

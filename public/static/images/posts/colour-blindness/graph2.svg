@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="640" height="540" viewBox="0 0 640 540" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#e6f0fa">
+
+  <line x1="40" y1="20" x2="600" y2="20" stroke-width="1" stroke="#c3c3c3"></line>
+  <text dy=".32em" x="25" y="20" style="fill: #444444; font-family: helvetica, arial, sans-serif;">x</text>
+
+  <line x1="40" y1="65" x2="600" y2="65" stroke-width="1" stroke="#c3c3c3"></line>
+  <text dy=".32em" x="25" y="65" style="fill: #444444; font-family: helvetica, arial, sans-serif;">x</text>
+
+  <line x1="40" y1="110" x2="600" y2="110" stroke-width="1" stroke="#c3c3c3"></line>
+  <text dy=".32em" x="25" y="110" style="fill: #444444; font-family: helvetica, arial, sans-serif;">x</text>
+
+  <line x1="40" y1="155" x2="600" y2="155" stroke-width="1" stroke="#c3c3c3"></line>
+  <text dy=".32em" x="25" y="155" style="fill: #444444; font-family: helvetica, arial, sans-serif;">x</text>
+
+  <line x1="40" y1="200" x2="600" y2="200" stroke-width="1" stroke="#c3c3c3"></line>
+  <text dy=".32em" x="25" y="200" style="fill: #444444; font-family: helvetica, arial, sans-serif;">x</text>
+
+  <line x1="40" y1="245" x2="600" y2="245" stroke-width="1" stroke="#c3c3c3"></line>
+  <text dy=".32em" x="25" y="245" style="fill: #444444; font-family: helvetica, arial, sans-serif;">x</text>
+
+  <line x1="40" y1="290" x2="600" y2="290" stroke-width="1" stroke="#c3c3c3"></line>
+  <text dy=".32em" x="25" y="290" style="fill: #444444; font-family: helvetica, arial, sans-serif;">x</text>
+
+  <line x1="40" y1="335" x2="600" y2="335" stroke-width="1" stroke="#c3c3c3"></line>
+  <text dy=".32em" x="25" y="335" style="fill: #444444; font-family: helvetica, arial, sans-serif;">x</text>
+
+  <line x1="40" y1="380" x2="600" y2="380" stroke-width="1" stroke="#c3c3c3"></line>
+  <text dy=".32em" x="25" y="380" style="fill: #444444; font-family: helvetica, arial, sans-serif;">x</text>
+
+  <path d="M 40 200 L 170 300 L 320 250 L 470 300 L 600 100" fill="transparent" stroke="rgb(203,203,203)" stroke-width="2.5"></path>
+  <path d="M 40 100 L 170 135 L 320 300 L 470 200 L 600 100" fill="transparent" stroke="rgb(92,92,92)" stroke-width="2.5"></path>
+  <path d="M 40 150 L 170 200 L 320 100 L 470 200 L 600 250" fill="transparent" stroke="rgb(143,143,143)" stroke-width="2.5"></path>
+
+
+  <path d="M 50 440 L 150 440 L 150 500 L 50 500 L 50 440" fill="rgb(203,203,203)"></path>
+  <text dy=".32em" x="75" y="470" style="fill: #FFFFFF; font-family: helvetica, arial, sans-serif; font-size: 2em;">323</text>
+
+  <path d="M 260 440 L 360 440 L 360 500 L 260 500 L 260 440" fill="rgb(92,92,92)"></path>
+  <text dy=".32em" x="285" y="470" style="fill: #FFFFFF; font-family: helvetica, arial, sans-serif; font-size: 2em;">400</text>
+  
+  <path d="M 470 440 L 570 440 L 570 500 L 470 500 L 470 440" fill="rgb(143,143,143)"></path>
+  <text dy=".32em" x="495" y="470" style="fill: #FFFFFF; font-family: helvetica, arial, sans-serif; font-size: 2em;">289</text>
+
+</svg>

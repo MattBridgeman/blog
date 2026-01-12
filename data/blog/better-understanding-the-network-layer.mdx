@@ -1,0 +1,64 @@
+---
+title: 'Better Understanding the Network Layer'
+date: '2017-05-18'
+tags: ['networking', 'linux', 'web development', 'reading']
+draft: false
+authors: ['default']
+---
+
+This month I spent a long weekend with my wife in Spain. In contrast to some of our more recent (pretty hectic) city breaks it was a chance to relax and do plenty of reading.
+
+Besides finishing A Feast for Crows (a book I've been reading off and on for the past 2 years!) it was a chance to finally get round to reading Ilya Gregorik's often referenced [High Performance Browser Networking](https://hpbn.co/) as well as some of Julia Evans zines including [Networking Ack](https://jvns.ca/zines/#networking-ack). Both were great reads for understanding more about the network layers that the web utilises and both are kindly available to read for free online. I'd definitely recommend reading both though if I had to start somewhere Julia's zine would be the place. Whilst it's still fresh in my mind I wanted to write what I learned about TCP and UDP.
+
+### The anatomy of a packet ###
+
+Both TCP and UDP work by sending packets of data over airwaves and wires. A packet consists of information like source and destination MAC address, IP / port as well as info about the data like the fragment offset (in the case of TCP) and of course the data itself. Julia's zine has a helpful diagram of a packet.
+
+<Figure 
+  src="/static/images/posts/the-network-layer/anatomy-of-a-packet.png"
+  alt="anatomy of a tcp / udp packet"
+  caption="Anatomy of a packet"
+  sourceHref="https://jvns.ca/networking-zine.pdf"
+  sourceTitle="jvns.cs" />
+
+### DNS lookups with UDP ###
+
+A common usage of UDP is a DNS lookup. When a browser navigates to a link you click on, say `http://mattbridgeman.co.uk/blog`, before the browser can communicate with that server it must look up the IP address that corresponds with that domain. To do so it uses a Domain Name Server. Running `ping mattbridgeman.co.uk` will result in your operating system making a request to a DNS server.
+
+DNS servers are widely distributed and therefore likely to be located relatively close to an end user. See this map of root DNS servers worldwide.
+
+<iframe src="https://www.google.com/maps/d/embed?mid=1LcHEpzl-7RzziWzDa4h3BxJcbEo&hl=en" width="440" height="380"></iframe>
+
+This coupled with the fact that DNS requests are compact, only requiring one packet out and one back, in isolation it's a relatively small operation. However when you consider an average web page depends on resources from dozens of domains it's easy to see how there can be a performance penalty for these round trips.
+
+### HTTP requests with TCP ###
+
+A common usage of TCP is HTTP. In order to retrieve the contents of a web page your browser will ask the operating system to open a TCP socket with the IP and port of the server it wishes to talk to.
+
+<Figure 
+  src="/static/images/posts/the-network-layer/three-way-handshake.svg"
+  alt="TCP three way handshake"
+  caption="TCP three way handshake"
+  sourceHref="https://hpbn.co/building-blocks-of-tcp/"
+  sourceTitle="hpbn.co" />
+
+Opening a TCP socket requires a three way handshake between the client and server. To do this your OS will send a packet to that server to initiate a connection (referred to as SYN). This is the first phase of a handshake between the client and server. Once the server has received this message it will acknowledge the request with a packet (SYN ACK). Once the client has received the acknowledgement it can send a packet acknowledging the acknowledgement. Phew. That packet can also contain the HTTP request for the web page.
+
+This means that in order to request a web page there is at least one round trip to a DNS server as well as at least two round trips to the server with the web page, something I had previously not been aware of.
+
+### The limitations of TCP ###
+
+Chapter 2 of HPBN is a fascinating insight into the history and complexities of TCP. The protocol is designed to avoid flooding a network with traffic that it can't handle. For each TCP connection, each node is responsible for managing the capacity of the underlying network. This is achieved by a server sending a small amount of data through the connection, and slowly scaling up the amount of info until intermediate servers can't handle the load and packets are dropped. A dropped packet is an indicator that the network limit has been met and the server will adjust and slowly scale up again. This process continues, reaching a point where the optimum amount of data can be sent without packet loss.
+
+<Figure 
+  src="/static/images/posts/the-network-layer/congestion-avoidance.svg"
+  alt="Congestion Avoidance"
+  caption="Congestion Avoidance"
+  sourceHref="https://hpbn.co/building-blocks-of-tcp/"
+  sourceTitle="hpbn.co" />
+
+What this means is that at the start of a TCP connection, during this warm up phase, the amount of data being sent is suboptimal. A problem this presents the web is that often resources are very small so you may not reach the peak data between two nodes before a request is complete. This is also coupled with the fact that the bigger the distance between two nodes, the slower the feedback loop is when determining this peak data flow rate, another performance issue.
+
+I'd heard of TCP warm up but had never previously understood what it is and what impact it has on the websites we build. This among a whole host of other reasons leads Ilya Gregorik to conclude that it is latency not bandwidth that is the bottleneck of the web.
+
+I've learnt a lot about TCP and would definitely recommend anyone interested in networking and web performance to have a look at these two resources.

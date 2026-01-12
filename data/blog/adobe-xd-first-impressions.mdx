@@ -1,0 +1,87 @@
+---
+title: 'Adobe XD - First Impressions'
+date: '2017-11-11'
+tags: ['front end', 'design', 'adobe', 'xd']
+draft: false
+authors: ['default']
+---
+
+At my workplace, our UI team is debating which design and prototyping tools we should adopt. Our current setup is fairly ad hoc. Designers use whichever tools they are familiar with or have installed on their machines. The two main contenders for new design tools are Sketch and Adobe XD (and Invision Studio which as of writing this hasn't been released yet). 
+
+Since I already have an Adobe CC licence I thought I'd give Adobe XD a go.
+
+### Initial impressions
+
+Opening up Creative Cloud I kicked off the download for XD expecting that it would take a couple hours and a couple GB of disk space. Just a few minutes later and it was downloaded! The full XD download comes to an impressive 97mb. Compare that to Photoshop, which is a whopping 2.1GB and Illustrator a similarly large 1.16GB, XD is very compact!
+
+### Bye bye waiting screens
+
+<Figure 
+  src="/static/images/posts/xd-first-impressions/photoshop-splash.png"
+  alt="Photoshop CS3 Splash"
+  caption="Photoshop CS3 Splash"
+  sourceHref="https://jakearchibald.com/2017/netflix-and-react/"
+  sourceTitle="jakearchibald.com" />
+
+The app loads very quickly too. No staring blankly at the infamous Adobe gravestone commemorating the authors that created it as Jake Archibald noted in [a recent post](https://jakearchibald.com/2017/netflix-and-react/). 
+
+### Simple interface
+
+<Figure 
+  src="/static/images/posts/xd-first-impressions/ps-startup-screen.png"
+  alt="Photoshop CC"
+  caption="Photoshop CC" />
+
+<Figure 
+  src="/static/images/posts/xd-first-impressions/xd-startup-screen.png"
+  alt="Adobe XD CC"
+  caption="Adobe XD CC" />
+
+My initial UI observations were that it's very simple. In contrast with the Photoshop sidebar you are limited to creating simple shapes: squares, circles, lines with a pen tool for creating more complex shapes. I like this simplicity. This isn't a tool for crafting intricate logos or creating multi-layered photo compositions. It's simply a web design and prototyping tool.
+
+### Artboards
+
+Along with basic shape tools, XD introduces a new concept: Artboards.
+
+An artboard is simply a canvas that you can add elements to, however they have a few nice features that help with web design. Firstly, they come in preset device sizes. By default, the artboard size is the iPhone 6 / 7s viewport size of 375px by 667px. 
+
+Each XD project can have multiple artboards which can represent different pages of a design or different states, such as a menu open / close. By choosing "prototype" in the top left, you can select elements on an artboard and link them to trigger the display of another artboard. These transitions can have animations, which makes rapid prototyping quick and easy.
+
+<VideoFigure 
+  src="/static/video/posts/xd/drum-machine-transition.mp4"
+  alt="XD Prototype"
+  caption="XD - Drum Machine Prototype" />
+
+Once you've created a prototype you can preview it and record the transitions. The exported video above shows some new UI features I'm working on for my [Drum Machine](https://mattbridgeman.github.io/drum-machine/) project.
+
+### Assets
+
+Along with artboards XD introduces a concept of "assets" which includes Symbols, Character Styles and Colours.
+
+<Figure 
+  src="/static/images/posts/xd-first-impressions/xd-assets.png"
+  alt="XD Assets"
+  caption="XD Assets" />
+
+### Symbols
+
+A symbol is a reusable UI pattern. To create one, simply make some shapes, select them and click "add symbol". You can then drag and drop these symbols onto artboards from the assets panel.
+
+
+### Character styles
+
+After creating a textbox, you can save its "character style", which is a combination of typeface, font weight and colour.
+
+### Colours
+
+When you make any shape, you can save its colour. These colours can then be applied as a text colour or a shape's fill or border colour.
+
+### Conclusions
+
+**Full disclaimer** I am not a designer, but I've found that having an understanding of design tools is essential to be a good front end developer. Historically the tools used within the UI teams I've been involved with have been Photoshop, Illustrator and Fireworks.
+
+Photoshop and Illustrator have been web design industry standards for years, despite the fact that they fundamentally weren't designed to create web experiences. Fireworks was much more aligned with creating websites, however it was discontinued from Adobe's product line. 
+
+With Sketch coming to the forefront of web designers toolsets, Adobe have arguably been on the back foot until recently with the addition of tools like XD.
+
+With that said my main conclusion from using XD is simplicity seems to be its biggest selling point. Gone are the bloat of features that are the usual hallmark of Adobe products, replaced with a simple focus on helping users design and prototype web experiences. I would definitely recommend trying it out.

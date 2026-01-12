@@ -1,0 +1,49 @@
+---
+title: 'Book review: Growing object oriented software, guided by tests'
+date: '2015-06-14'
+tags: ['Books', 'OOP', 'TTD']
+draft: false
+authors: ['default']
+---
+
+I recently went on holiday and decided to read 'Growing object oriented software, guided by tests'. It's a book I've had for a while and to be honest I've tried and failed to read before. Previously I found the code examples difficult to understand as they are written in Java, however since using typescript, my understanding of programming languages with static type checking has massively improved. On the whole it's been a massive help in understanding how to carry out test driven development so I thought I'd write a post to summarise some of the goodies it contains.
+
+### The book is split into three main sections
+
+  1. General best practices for object oriented software
+  2. A practical example of growing a piece of software via tests
+  3. Keeping test driven development maintainable
+
+### General useful takeaways
+
+The book has lots of useful takeaways both in and beyond the paradigm of object oriented software. In the first section there's advice about naming variables, using programming patterns / rules and application architecture advice aimed to facilitate writing code that's easier to test as well as promoting the idea that code should be designed to express the intent of the developer that wrote it.
+
+### Test driven development
+
+The guiding principle of the book is to write failing tests before writing code. The benefit of this is that you focus on describing at a high level what the code should do before getting wrapped up in how to technically implement it. If you're struggling to write a test it can be a sign that the code you're trying to test is too tightly coupled to its surrounding environment or is lacking one single responsibility and therefore that code design changes are required. It can also be a sign that the test you are trying to write isn't focussed enough.
+
+### TDD applied
+
+The main section of the book is an applied example of how to grow a piece of software with tests. For me as a front end developer, one very small drawback is that inevitably not all the examples apply to JavaScript as they are written in Java e.g. Types / annotations that simply don't exist in JavaScript and complier errors that JS is more forgiving about. However the authors of the book are open to admitting that Java isn't perfect and at times lacks expressiveness. Also, the language they use outside of the code samples is pretty generic and therefore applies to more than just Java.
+
+### Baby steps
+
+Some other takeaways that I definitely agree with are to keep code compiling, minimise time code is broken and increment in small steps. The benefit of this is that it maximises the amount of commits you can make without branching and prevents you from tearing apart a piece of software when refactoring.
+
+### Ugly code isn't all bad
+
+Following the TDD tenant of red, green refactor, the aim isn't to write perfect code first time, the aim is instead to pass the failing test. Once the test has sucessfully passed, the code should be refactored to drive out code smells and follow best practices.
+
+### Diagrams
+
+The book has some really helpful application and state machine diagrams which whilst the authors aren't explicit about the need to do this, they feel like a very helpful tool in getting to the right architecture. For example, before writing their first failing test, the authors draw a diagram of the applicaton's state machine and start with the shortest, simplest path through it. They write a failing test for that path, then make it pass. Each incremental change beyond that fleshes out another path of the the state machine diagram until the program is fully functional.
+
+### Expressiveness
+
+As I've mentioned before the authors favour code that expresses the developers intent highly over say code that takes up the smallest amount of characters. Therefore they argue that test names and their contents should read like a sentence to express what the underlying code 'does' rather than what it 'is'. This is a mistake I've regularly made with unit testing. For example, in the past I've written a test for every method on an object with each test name being the corresponding method name. This fails to describe the purpose of the object as a whole and doesn't fulfil an important function of the test, which is to create a narrative of how the object is intended to be used.
+
+Also under the banner of expressiveness, they argue that the language being used in a test should be high-level, domain specific and non-technical to the point where someone with no experience of the code base (or no experience of programming for that matter) could read what the test is trying to cover.
+
+### Conclusions
+
+The complexity of the book reflects the complexity of the subject. What I've learned from it is that writing tests, much like writing code, is a skill in of itself. My goal is to start practicing test driven development with all my personal projects with the aim of developing my ability to write tests and hopefully improve my code design guided by listening to the tests. I believe this book will serve as a great reference for refining these skills and would highly recommend it to anyone interested in test driven development.

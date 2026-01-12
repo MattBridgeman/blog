@@ -1,0 +1,102 @@
+---
+title: 'Drum machine - dev log'
+date: '2016-06-26'
+tags: ['drum machine', 'web audio api', 'react', 'ES6', 'web development']
+draft: false
+authors: ['default']
+---
+
+About a year ago I started on a personal coding challenge to create a drum machine using nothing but good old HTML, CSS and JS. You can [try in out here](http://mattbridgeman.github.io/drum-machine/)!
+
+### Why make a drum machine? Simple... I love music software
+
+I've always loved music making software. Since I learned the first family PC in the house was capable of synthesising noise I've been fiddling with music making tools. From Music 2000 on a Windows 98, to Music 3000 on a PS2, Music Maker 2005 and Fruity Loops on XP and more recently Reason and Logic on a Mac, music software has been a source of fun and creativity.
+
+Since getting into web development I've always had in my mind that I'd love to make audio software. Something that has the instant gratification of programming beats in Music 2000 has been my goal. My pipe dream (in the distant future) is to end up with a product with the rich UI and compositional capabilities of the likes of Reason. The advent of the Web Audio API has made it possible to create music making tools on the web with nothing more than HTML, CSS and JS, and brought my ideas closer to reality.
+
+### Why else? To work on 'the cool kid' stack
+
+As a front end developer, I'm bombarded with buzzword technologies that may be here today, gone tomorrow, and aren't always applicable to workplace projects. For me greenfield, personal projects are the perfect way to explore the technologies that as Dave Smith of JS Jabber so succinctly phrased, 'The cool kid stack'. Those technologies namely being (apologies for those reading in 2 weeks time):
+
+- React
+- Redux
+- Mocha / Chai
+- Babel / ES6
+- Browserify (why not webpack I know?)
+- Grunt (again I know but I like it!)
+- RxJS
+
+At the time I started I had no previous experience with React. Flux was big at the time so initially my store used a flux architecture, but luckily soon after starting the project, Dan Abramov created Redux, which I quickly converted to.
+
+### Technical issues
+
+The Redux workflow by and large has been fantastic. Redux works very well for defining state changes that can be expressed in pure data. The UI state, which is a reflection of the state of the drum machine parameters, can be expressed intuitively through Redux's actions and reducer concepts. As a general principle I've found data / state that can be defined as immutable data structures are a perfect fit for this workflow or as Dan Abvramov puts it 'data that is easily serialisable'.
+
+For instance I have a 'reverb length' parameter that I want to express as a data structure. In Redux, it's fairly simple to do so:
+
+``` javascript
+const CHANGE_REVERB_SECONDS_TO_AMOUNT = "CHANGE_REVERB_SECONDS_TO_AMOUNT";
+
+let initialState = {
+    seconds: 3,
+    decay: 3
+};
+
+function reverb(state = initialState, action){
+    switch(action.type){
+        case CHANGE_REVERB_SECONDS_TO_AMOUNT:
+            return Object.assign({}, state, { seconds: action.value });
+        default:
+            return state;
+    }
+}
+```
+
+In my UI layer changes to parameters trigger actions to be dispatched in the Redux store which get consumed by the above 'reducer'. If the type of action dispatched matches one that this reducer responds to, then the reverb state will be transformed and later in the chain the UI will respond.
+
+### Web Audio and Redux
+
+The main stumbling block I've come across with this workflow has been translating the drum machine UI state (stored in the Redux layer of my app) into Web Audio components and parameters. React, Redux and immutable data allow you to think about UI / state changes in a very declarative, functional manner. The UI can be considered a function of the state stored in Redux and state changes in the Redux layer can also be expressed in terms of pure functions.
+
+In contrast declaring Audio nodes and making changes to them suddenly feel very imperative and impure. Once an audio node has been created the only way to change a parameter on it is to mutate the object e.g. master.gain.value = 1. I haven't found a solution to this feeling just yet, but I'm thinking that React could hold the answer. Rather than defining and connecting Audio API nodes imperatively, if each node was declared in JSX, you could turn this:
+
+``` javascript
+var volume = context.createGain()
+var master = context.createGain()
+
+volume.connect(master.connect(context.desination));
+```
+
+Into this:
+
+``` html
+<Desination>
+    <Master gain=0.5 >
+        <Volume gain=1 />
+    </Master>
+</Desination>
+```
+
+### Keeping the tempo
+
+Adding to the complexity of working with the Web Audio API is the fact that a fundamental feature that I wanted the drum machine to have is for parameters to be able to change over time e.g. As the drum machine is playing, you can change the patterns, volumes, tempo etc. For me this kind of fast feedback is essential for an effective and enjoyable drum machine but creating this does present challenges.
+
+The main issue being you have to create as shorter 'buffer' time as possible so that changes to patterns, tempo etc feel instant. My first technique was to effectively have an event loop based on requestAnimationFrame. In that loop I check whether the interval time between two sixteenths at the current tempo has passed and if so I play any selected sounds. 
+
+The downfall with this approach is that sounds can be n milliseconds out depending on how long the loops are taking. If the drum machine UI is running at the goal of 60 FPS and the drum machine is running at 120 BPM there will be one sixteenth every 125ms and on frame every 16 milliseconds.
+
+This means that sounds could be at a maximum of 16 milliseconds out, which isn't particularly noticeable at least to my ear. However it does become noticeable when the frame rate drops significantly. Say the FPS drops to 20, the gap between frames will be 50ms which definitely definitely creates audible tempo changes.
+
+### Adding a buffer
+
+My second was to add in a buffer, effectively scheduling in beats to play ahead of time. The buffer time is calculated by taking the interval between two beats and halving it. If a cycle of the event loop fires within the buffer time frame then I tell the audio layer to schedule a beat to play in the future. This means that the frame rate would have to drop significantly for the tempo also to drop and though it's early days the technique seems to be much more robust.
+
+### Reverb: a costly calculation
+
+More recently I added 'simple reverb' to the drum machine, which is a nice small library for creating reverb effects to Web Audio projects. It's interface is simple and intuitive to use. You spawn up a new SimpleReverb instance, connect sound buffers to it and change parameters like 'seconds', 'decay' and 'reverse' to change the sound of the reverb.
+
+The library comes at a cost though. Because of the way the Web Audio 'convolver node' works, you have to define the reverb in terms of an array of values ranging from -1 to 1. The array length is the product of the playback rate (say 44100 hertz) and the length of the reverb (say 2 seconds) which in this case would be 88200. As it turns out, setting 88200 values in an array and doing that operation twice (once for the left channel, once for the right) is an expensive operation. This is most noticeable when the drum machine is running and you turn one of the knobs to change the reverb parameters. Doing so on my work machine caused a drop in the responsiveness of both the UI and the tempo, essentially both caused by the main thread being clogged up with this operation. I haven't found a solution to this yet but my current thinking is that I could use a web worker to perform this operation and pass back the data to the main thread, freeing it from the burden of this operation.
+
+### Conclusion
+
+The fruits of my labour can be seen [here](http://mattbridgeman.github.io/drum-machine/) and the code itself is all hosted on [github](https://github.com/MattBridgeman/drum-machine). Hopefully more updates to follow soon.

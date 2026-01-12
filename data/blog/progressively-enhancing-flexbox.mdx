@@ -1,0 +1,53 @@
+---
+title: 'Progressively enhancing Flexbox'
+date: '2016-12-30'
+tags: ['progressive enhancement', 'flexbox', 'web development']
+draft: false
+authors: ['default']
+---
+
+**TL;DR** Use floats, block, inline-block and table. Layer flex on top.
+
+### In years gone by ###
+
+In years gone by we've used (and abused) a very limited tool set of CSS properties to create a variety of layout styles. 
+
+*Want evenly spaced columns?* Use floats and percentage widths on child items. But don't forget to clear the parent container otherwise your layout kind of breaks. 
+
+*Want a container element to dynamically space child elements out evenly?* Use `display: table;` on the parent and `display: table-cell;` on the children. But don't expect them to wrap onto a new row. And don't forget to `width: 100%;` the table.
+
+*Want one item to be a fixed width and the other items to take up the available space?* `display: table;` could again be your friend here. Apply a fixed width to the child you want to constrain. But this is definitely pushing the boundaries of what `display: table;` was designed to do.
+
+*Want a child element to be vertically and horizontally aligned within a parent element? Want columns to be identical in height without declaring a specific height?...* _*Cough*_, um well turns out that's not so easy.
+
+The long and short of it is that as web design has become more rich, we've come to expect more ans more of our layouts than these basic tools can give us.
+
+### Flexbox to the rescue ###
+
+Flexbox is a web standard that addresses many of the shortcomings of existing techniques for creating layouts in CSS and as a developer, using flexbox can feel liberating. Simply applying `display: flex;` to a parent element will align all child items in a single row. No need to clear floats as the dimensions of the parent element are handled for you.
+
+*Want columns to be identical in height without declaring a specific height?* Simply apply `align-items: stretch;`
+
+In fact all the examples above can be achieved with just a few lines of flex code, see this [CSS tricks article](https://css-tricks.com/snippets/css/a-guide-to-flexbox/) for more.
+
+### Back to reality ###
+
+Browser support for flexbox is pretty good, but there are some notable exceptions such as IE9. IE10 has support behind the `-ms-` prefix, however there are [_lots_ of problems](https://github.com/philipwalton/flexbugs) with it.
+
+Vendor prefixing has become a common practice in recent years of front end web development, whether it be in the form of less / sass mixins of autoprefixer. However given the amount of bugs in vendor prefixed versions of flexbox I would argue for a different approach.
+
+### Progressively enhancing to flexbox ###
+
+In my opinion one of the greatest features of the flexbox spec is its ability work with existing layout styles. For instance if you want columns spaced at a 3rd of their container you can declare `float: left; width: 33.3%;` on child items. Now let's say you want each of these items to be the same height (again without declaring a fixed height on the child items). All you need to do is `display: flex; align-items: stretch;` on the parent element and hey presto, you have equal height columns.
+
+Now IE9 and 10 don't know what `display: flex;` is so they will simply ignore that rule and won't get equal height columns but to me this feels okay. It doesn't break the layout of a page unforgivably.
+
+Similarly if you want two elements in a row, with one element being a fixed width and one taking up the rest of the space, you can use `float: left;` with a width declaration on the fixed element and `display: block;` on the other element. Then you can apply `display: flex;` on the parent and `flex-grow: 1;` on the child item you want to be a dynamic width.
+
+### Drawbacks ###
+
+The obvious drawback to progressively enhancing to flexbox is you effectively have 2 sets of styles to maintain. I say 2 but it's more like 1.5. That's because in the above examples, flexbox just sprinkles on some nice haves to an already functioning layout. Those sprinkles being the ability to stretch elements to an equal height and growing and shrinking dynamically sized elements and the like.
+
+### Conclusion ###
+
+If IE9 and 10 don't make up a significant amount of web traffic then perhaps you can switch wholesale to flexbox but I think it's always worth using the most simple and widely available tools for the job. 

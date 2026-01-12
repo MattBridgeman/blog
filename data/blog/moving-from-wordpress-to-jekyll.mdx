@@ -1,0 +1,33 @@
+---
+title: 'Moving from Wordpress to Jekyll'
+date: '2016-05-06'
+tags: []
+draft: false
+authors: ['default']
+---
+
+I've been using Wordpress for a long time now (about 8 years). In that time I've used it on countless projects, it's been my personal blogging platform since uni and I was also involved in a lot of freelance Wordpress projects throughout uni. To its credit, Wordpress has a lot of positives: it's easy to host (especially on uni student pocket friendly hosting services), it has a slick CMS and has an amazing community of plugin authors and bug fixers.
+
+### Drawbacks of Wordpress
+
+Probably my biggest issue with Wordpress is that programming themes is an absolute nightmare. Over the years of administering my blog I've attempted many a redesign, each of which I've given up due to the horrible architecture of Wordpress themes. Unintuitive while / for loops and functions.php are enough to bring a shiver to the spine. I've also never found it particularly intuitive for creating generic site pages (for my homepage I resorted to static HTML). It's also difficult to automate the release of new designs and code changes, something that node.js and other command line driven server side technologies have made trivial.
+
+### Moving to Jekyll
+
+The drawbacks of Wordpress have driven me to look for alternatives and Jekyll is an option I've been exploring for a while. Built on ruby, it has a simple config and folder structure and is driven by an intuitive command line interface which builds the site to a discrete '_site' folder (or a folder of your choosing). This means it can easily be built and deployed with some simple hooks. I found a useful article on [automating the release of code changes and posts via git push](https://www.digitalocean.com/community/tutorials/how-to-deploy-jekyll-blogs-with-git) that I would definitely recommend. 
+
+Migrating my posts was pretty easy. I don't have a huge amount of posts but enough to make a manual migration not particularly feasible. I found a useful plugin to [export all Wordpress posts to Jekyll](https://github.com/benbalter/wordpress-to-jekyll-exporter). That being said, the process hasn't been all smooth sailing.
+
+### Windows Windows Windows
+
+Working on the site locally on a Windows machine, I came across a strange message: 'could not read file [filename]: unknown keyword:categories', which was causing jekyll build to fail. Searching the issue someone suggested updating Ruby from 2.0.0 to 2.3.0. After that everything seemed to start working again (though the errors still appear strangely enough). Dave Rupert has catalogued a number of issues with [working on Ruby projects in Windows environments](http://daverupert.com/2015/08/developing-on-windows/) and also highlights that hopefully [bash on Windows](http://daverupert.com/2016/04/jekyll-on-windows-with-bash/) should become the solution to end our woes.
+
+### Deployment
+
+A deployment issue I came across was that when running Jekyll build to a different directory, I was getting a folder permission issue. Turned out you need to run `sudo chmod 775` on the folder that you want jekyll to write files to so users in the same Linux user group can write files.
+
+Beyond that it's just been a case of learning how to solve the usual problems like cache busting, thanks [tkareine](http://tkareine.org/blog/2013/02/22/asset-bundling-with-jekyll/), and [pagination](https://jekyllrb.com/docs/pagination/).
+
+### Conclusion
+
+I'm still a big fan of Wordpress and for non-developers I think it's a great solution for managing the content of small sites. That being said I'm looking forward to the ease of maintaining and deploying a Jekyll blog.

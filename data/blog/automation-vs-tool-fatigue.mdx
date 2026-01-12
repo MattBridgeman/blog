@@ -1,0 +1,59 @@
+---
+title: 'Automation vs tool fatigue'
+date: '2016-08-02'
+tags: ['automation', 'tooling', 'web development']
+draft: false
+authors: ['default']
+---
+
+I recently released [Drum Machine](https://mattbridgeman.github.io/drum-machine/), a personal project I've been working on for the past year or so. In the process of making it, I've explored many new tools and one of the key focuses for me when developing the project was automation. In the process of getting to automation I've learnt a lot about its benefits and costs as well as how best to implement it.
+
+### Automation works best when introduced early ###
+
+One of the things I've learned in the last few years is that automation is something that is very difficult to retrofit to a project. Take for instance my personal site, I have been looking for a way to automate the deployment of Wordpress sites for a number of years and whilst I found some solutions, none were compelling / convenient enough to adopt.
+
+I believe the reason Wordpress suffers from this issue is largely due to its own legacy. It was created at a time of one click installs, FTPing to servers and hosting environments where your only means to administer your server was GUI tools like phpmyadmin. It's lack of CLI tools and subsequent lack of ability to automate processes come as a result of this.
+
+### The cool kid stack to the rescue ###
+
+Since it's difficult to retrofit automation, selecting the right tools at the start of the Drum Machine project was of immediate importance. Coming back to the idea of the 'cool kid stack' (a phrase coined by Dave smith of JS Jabber fame) one of the features I like about recent trendy front end tools is the ease of automation that come with them. Below are some of my automation goals and how I tackled them.
+
+### Automating repetitive tasks ###
+
+Grunt is a task runner that allows you to execute node JS processes via the command line. For instance in the drum machine project, running ``grunt build`` will trigger the following operations:
+
+Clean - will clean the 'build' folder of any previously deployed code
+Less - will run the LESS process and compile all CSS
+Copy - copies the static files needed such as HTML and WAV files to the build folder
+Browserify - Takes all of the ES6 modules and compiles them into one main ES5 JS file.
+
+This level of automation lends itself to extensibility. For example if I want to add a minify process to the CSS or JS (or both), steps can be added to the build process without the need to alter the API for producing a build which remains ``grunt build``.
+
+### Auto testing ###
+
+Grunt being a central part of the development process opens up the possibility for automated testing. Drum Machine is a JS heavy project and so to ensure that the behaviour driven by JS is not unintentionally changed I introduced Mocha into the workflow. Mocha is a tool for testing Node JS projects. It assumes little or nothing about the environment it's ran against (e.g. It has no concept of browser specific global variables like document or window). The leads to the need to explicitly think about these dependencies when writing code as failing to do so will result in failing tests.
+
+I'm also using the complimentary assertion library 'chai' which attempts to use natural language to describe tests e.g. ``expect(a).to.equal(b)``. To run my mocha tests I use ``grunt test`` (though it's worth noting running these tests is also possible via Mocha's standalone CLI).
+
+### Building, testing and deploying builds with Travis ###
+
+Automation via command line tools gives you the ability to chain operations together. Crucially this allows me to deploy new versions of the drum machine if (and only if) the following processes have taken place:
+
+1. Upon receiving a new repo commit, Travis starts the build process with ``grunt build``
+2. If this succeeds, Travis will then run the ``grunt test`` process
+3. If all is okay with the above steps, Travis will deploy the built code to the gh-pages branch of the repo which will end up on the [github.io page](https://mattbridgeman.github.io/drum-machine/).
+
+This is thanks in no small part to [Allra's fantastic Travis automation scripts](https://github.com/alrra/travis-scripts), he's done a lot of the hard work for those of us that wish to auto deploy to GitHub pages.
+
+### Is this tool fatigue? ###
+
+To get to this level of automation I have undoubtedly introduced a lot of tools to the process: node, npm, grunt, mocha, git, GitHub, Travis (whew…) and a question I have asked myself (as has the JS community of late) is do I need these tools?
+
+The pragmatic part of me still thinks that a simpler approach to deploying would be to just have plain HTML, CSS and JS with no build tools. This approach would enable you to just commit all your code and do a push to the gh-pages branch of the repo.
+
+However this thought neglects the fact that I'm already using git and GitHub, which without I would not be able to so easily deploy code with a single command line. It also neglects two benefits that come as a consequence of this workflow:
+
+1. Builds and tests occur without a need for me to think about them beyond a push to GitHub (it's been a pleasant surprise to me when a build or test comes back failed as a result of unforeseen consequences caused by small changes in architecture)
+2. Deploys only occur when the above are satisfied (not exactly an issue with a pet project like Drum Machine, but certainly an issue for large scale / large audience workplace projects)
+
+The conclusion that I come to is that automation of tests and deploys ultimately require a number of tools working in harmony in order to be possible. In this instance, whilst you could choose to omit the likes of grunt, mocha, git, GitHub and Travis, what you you would gain in terms of a lower learning curve / barrier to entry and ongoing maintenance you would arguably loose as a result of lower confidence in deploys and the introduction of human error as a consequence of having to introduce manual processes. If, for a project like this, you value automation and its benefits you also value the tools that make it possible.

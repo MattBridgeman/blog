@@ -1,0 +1,62 @@
+---
+title: 'No JS is an anti pattern Pre JS FTW'
+date: '2016-12-21'
+tags: ['progressive enhancement', 'no JS', 'web development']
+draft: false
+authors: ['default']
+---
+
+There's an aspect of progressive enhancement that makes me feel a little uneasy. No JavaScript.
+
+``` html
+<body class="no-JS">
+    <script>document.body.className = document.body.className.split("no-JS").join("");</script>
+...
+```
+
+If you've been making websites for a while, you've likely come across this pattern. A simple script at the top of the body element that, when executed, removes a class from the body. The idea being that if the class is never removed from the document, you know that JavaScript isn't enabled. This allows you to change how you style the page when JS isn't available, like so:
+
+``` css
+.no-JS ul.expandables li {
+    display: block;
+}
+```
+
+Whilst in principle I believe content websites should serve content without requiring JS, I think that the "no JS" pattern is the wrong way of approaching this scenario for the following reasons.
+
+### It's not as simple as "off" or "on" ###
+
+To paraphrase a sentiment from Jeremy Keith's [Resilient Web Design](https://resilientwebdesign.com) "[the web] is a continuum" and JavaScript is no different. There are many pieces that have to fall into place for JS to successfully execute:
+
+* Browser supports JS
+* Browser has JS enabled
+* There are no blocking JS requests before the JS in question
+* Network request for JS successfully completes
+* JS contains no parse errors
+* JS contains no runtime errors
+* Browser supports the features required for JS to execute successfully
+* Hardware that the JS runs on can handle the demand of the JS being executed
+
+If there is an issue with one or more of these pieces then JS will either not load, load slowly or will delay the user experience to an unacceptable degree. The 'No JS' pattern only covers the first 2 scenarios. Not only that, I think the 'No JS' pattern leads us to believe that if JS is available, the next 6 steps will happen quickly and without issue. From my experience this isn't always the case.
+
+### The gap between initial page request to JS being executed ###
+
+We know that mobiles often operate on flaky internet connections and this can delay or even prevent JS requests from completing. Even on a desktop, if you have a misbehaving CDN serving a script that precedes your own, execution order can mean that your JS will have to wait in line. If you adopt the "No JS" pattern then in the time that elapses between the initial page load and your JS executing you have a gap where your page does not function.
+
+### Pre JS FTW ###
+
+So how do you handle the gap between page load and JS execution? Recently the question I've found myself asking is "what do I want my 'Pre JS' experience to be"? I don't think there's one single answer to the question. Context is important in the answer. For example a list of collapsible panels could be deliberately left open until JS kicks in to close them and add event listeners for when they are interacted with. A drop down menu could perhaps just respond to CSS focus and hover states. A carousel could just have a horizontal scroll bar.
+
+So if the answer is so simple why are we not building sites like this?
+
+### The big challenge - "herk jerk" ###
+
+For me the biggest reason I've seen for not having an intermediate "Pre JS" state for components is what [Dave Rupert](https://daverupert.com/) described as "herk jerk". To paraphrase Dave, "herk jerk" is the jerky transition that occurs after JS kicks in and changes a web page. He described "herk jerk" in reference to when you load web fonts via JS. The page renders with CSS, then when the JS loads and executes... "WHAM"! You now have webfonts and the page looks completely different. Often this transition changes the layout of a page since font size and weight can increase forcing text to wrap onto new lines. The experience is jerky. The same jerk can be experienced when trying to use the "Pre JS" pattern. So how can we avoid "herk jerk"?
+
+### Reserve layout space ###
+
+One solution that I've been using recently is to constrain the height of elements or the ratio of elements on the page. That way when JS kicks in, the jerk experienced is less noticeable or not noticeable at all as the fundamental layout of a page stays the same.
+
+### Takeaways ###
+
+The "No JS" pattern has good intentions and is certainly more responsible than just blindly relying on JS being available to make a site functional. But this is only part of the story. There's can be a long gap between a page rendering and JS loading. If it loads at all. This limbo "Pre JS" state is equally important to users as "no JS" and we owe it to our users to make this web experience functional.

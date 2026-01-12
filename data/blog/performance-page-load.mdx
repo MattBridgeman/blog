@@ -1,0 +1,138 @@
+---
+title: 'Performance: Page load'
+date: '2015-01-09'
+tags: []
+draft: false
+authors: ['default']
+---
+
+Recently I've been taking a deeper interest in front-end performance. For as long as I've been developing websites there have been tenants of web performance: reducing requests, reducing file size, minification, caching to name a few. The faster you can get pixels on the page, the more chance your users will engage. Despite the necessity for performance, it's still easy to forget to carry out one or more of these tasks.
+
+[Paul Lewis](http://aerotwist.com/) and [Addy Osmani](http://addyosmani.com/blog/) have some great resources for staying on top of the performance of your web projects which have really made me rethink my approach to web perf. Using their knowledge, I've taken a look at my website to see what performance gains can be made!
+
+### Page Speed Insights
+
+[Page Speed Insights](https://developers.google.com/speed/pagespeed/insights/) is a very useful tool for measuring the performance of websites. In contrast to a lot of web performance tools, PSI focuses on simplicity: You give it a URL and it gives you a score out of 100 for both mobile and desktop. It also comes with a handy command line tool which can be installed via `npm install psi --save-dev`.
+
+Paul Lewis recommends aiming for a score of over 85 on mobile and 90 on desktop. Much of the performance grading criteria is the same between mobile and desktop and the key is to measure before and after you make any changes. So without further ado, here's an overview of how my site initially fared for desktop:
+
+### Initial score
+
+`$ psi http://www.mattbridgeman.co.uk`
+
+```
+URL:       http://www.mattbridgeman.co.uk/
+Score:     84
+Strategy:  desktop
+ 
+Number Resources                                 | 7
+Number Hosts                                     | 2
+Total Request                                    | 829 B
+Number Static Resources                          | 5
+Html Response                                    | 9.87 kB
+Css Response                                     | 83.43 kB
+Image Response                                   | 1.06 kB
+Javascript Response                              | 57.18 kB
+Number Js Resources                              | 2
+Number Css Resources                             | 1
+                                                 |
+Avoid Landing Page Redirects                     | 0
+Enable Gzip Compression                          | 5.95
+Leverage Browser Caching                         | 2.5
+Main Resource Server Response Time               | 0
+Minify Css                                       | 0.88
+Minify HTML                                      | 0
+Minify Java Script                               | 1.26
+Minimize Render Blocking Resources               | 6
+Optimize Images                                  | 0
+Prioritize Visible Content                       | 0
+```
+
+A score of 84, which wasn't too far off the goal of 90. One of the biggest concerns I noticed immediately was that my server wasn't returning gzipped responses for requests. Following [a tutorial](https://rtcamp.com/tutorials/nginx/enable-gzip/) I turned on gzipping within nginx:
+
+### Score after enabling gzip
+
+`$ psi http://www.mattbridgeman.co.uk`
+
+```
+URL:       http://www.mattbridgeman.co.uk/
+Score:     92
+Strategy:  desktop
+ 
+Enable Gzip Compression                          | 0
+```
+
+My score was now over the benchmark of 90, though there was still room for improvement! Enabling caching on all static resources was the next task. Each page on the site can be comprised of HTML, CSS, JS, images and other resources that can leverage browser caching to drastically speed up return visits. Here's how it fared after setting cache expiry to 30 days for all static content:
+
+### Score after setting cache expiry
+
+``` 
+URL:       http://www.mattbridgeman.co.uk/
+Score:     94
+Strategy:  desktop
+
+Leverage Browser Caching                         | 0.5
+```
+
+With some basic server configuration I've taken my PSI score up 10% to 94% for desktop and 84% for mobile. Whilst the performance criteria for desktop and mobile are similar, Page Speed Insights places an increased importance on eliminating render-blocking CSS and JS for above the fold content on mobile.
+
+### What is render blocking?
+
+It's something that I had never really considered before but traditionally the initial above-the-fold content cannot render until the entire page CSS and JS have loaded because these resources are all concatenated. One technique for eliminating this render blocking is to inline the styles, images and js related to above the fold content into the html and loading all other CSS and js asynchronously.
+
+I think eliminating render blocking is slightly overkill for this website, however it did lead me to think about the fact that I have inlined a number of fonts into the CSS file. Whilst this technique reduces the number of requests made (good) it also blocks the time taken to get pixels onto the page (bad). Determining what impact this has on a users experience requires going beyond Page Speed Insights.
+
+### Web Page Test
+
+[Web page test](http://www.webpagetest.org/) is another great tool for measuring the page load performance of a site. It has some great features like being able to target specific browsers and devices, bandwidth settings and the ability to capture a video of the page load. One of the most interesting metrics it has is the 'speed index', which is a metric for measuring the above the fold page render. The metric is measured in milliseconds so a speed index of 1000 equates to a load time of 1 second and that's my goal for each page on my site running on a typical desktop connection.
+
+Currently my speed index sits at 1200. Here's a breakdown of where that time is spent:
+
+``` 
+DNS look up:         0.35s
+Initial connection:  0.1s
+Recieve HTML:        0.1s
+Recieve CSS:         0.35s
+Recieve custom font: 0.1s
+Render:              0.2s
+```
+
+There are 2 areas where I see room for improvement. Firstly the size of the CSS file, which is largely down to the amount of fonts it has inlined into it. Currently there are a number of custom font weights that I'm loading into the CSS that aren't being used. I will be removing a number of these fonts when I make some updates to the design of the site.
+
+Secondly, one of the custom fonts used on the site is currently not inlined into the CSS and can only be requested by the server once the large CSS file has been downloaded. By inlining this font and removing unnecessary font weights, I'm hoping to bring the speed index below 1000.
+
+### Moving forwards
+
+There are a few other page load speed gains that I will be implementing along with some design updates to the site.
+
+### Minification
+
+Whilst I do have a grunt process for my CSS and JS, I haven't to this point implemented a minification step. This is a quick win and a 5 minute task that will bring down the size of these resources.
+
+### 301 Redirects
+
+One thing I spotted whilst using webpage test is that when I link internally to WordPress URLs I'm not adding a forward slash e.g. `/blog` instead of `/blog/`. The server then makes a 301 redirect to fix the missing slash which on a normal desktop connection takes 100ms. It doesn't sound like a lot but when my ideal page load time is 1 second, an unnecessary redirect is 10% of my budget!
+
+### Conclusions
+
+I've learnt some valuable nuggets of knowledge about web performance on this journey as well as busted some myths I held about how you speed up a page load.
+
+### Don't trust rules
+
+There are no hard and fast rules to improving web performance, what might be right for one site may not for another. A perfect example of this is the font inlining example: with a relatively small use of fonts on a site, inlining is justifiable to reduce the overall number of requests. On a larger scale site with more custom fonts this would would halt the page render for an impractical amount of time.
+
+Another example is do you prioritise initial page download speeds over repeat views, or visa versa? One priority tends to have a negative impact on the other e.g. inlining above-the-fold content reduces the cacheability of those assets, so it's a juggling act between trade-offs.
+
+### Measure, measure, measure
+
+Since there are no hard and fast rules to web perf, the only way to understand your page load times properly is through using tools like Web page test and Page speed insights. It's also important to measure before and after you make any changes to truly gain an understanding of the impact they're making.
+
+### Set benchmarks
+
+Having performance goals makes you think much harder about the cost that each request, font, library etc. has on your your web page performance and where you need to make changes or cuts to improve it.
+
+### Repeat
+
+Analysing performance is only effective if it's part of a continual workflow. With every tweak, new feature or redesign it's important to remeasure your site against the desired benchmarks.
+
+So my goals moving forward are to maintain a PSI score of 85 on mobile and over 90 on desktop and to get my speed index on Web page test to 1000.

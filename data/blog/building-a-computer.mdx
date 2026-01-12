@@ -1,0 +1,53 @@
+---
+title: 'Learning the building blocks of computing'
+date: '2018-09-07'
+tags: ['nand', 'binary', 'electronics']
+draft: false
+authors: ['default']
+---
+
+Recently a couple colleagues posted some links in our company Slack that got me set on a path to understanding more about the fundamentals of how computers work.
+
+### Nand game
+
+The first was [Nand Game](http://nandgame.com), an incredibly addictive educational tool that takes you from the basics of binary, logic gates and shows you how to combine them to create the building blocks of ever more complicated computational elements like registers and RAM, all the way to a CPU.
+
+
+<Figure 
+  src="/static/images/posts/building-a-computer/nandgame.png"
+  alt="Nand Game - Functioning RAM"
+  caption="Nand Game - Functioning RAM" />
+
+The most basic block given to you is a "nand", a unit with 2 single bit inputs and a single bit output. "nand" is short for "not and" meaning it only outputs 1 if both inputs are 0 (the opposite of "and" which only outputs 1 if both inputs are 1).
+
+### Nand inputs and output
+
+| input 1 | input 2 | output |
+| --- | --- | ---
+| 0 | 0 | 1 |
+| 1 | 0 | 0 |
+| 0 | 1 | 0 |
+| 1 | 1 | 0 |
+
+The first thing you learn to do with nand is build a bit inverter, a component with 1 input and 1 output. If the input is 0 it outputs 1, if the input is 1 it outputs 0. The way you do this is plug the input to both inputs of a nand. The nand output is then reduced to the 2 scenarios:
+
+| input 1 | input 2 | output |
+| --- | --- | ---
+| 0 | 0 | 1 |
+| 1 | 1 | 0 |
+
+Nands and inverters can then be combined to produce components with different outputs.
+
+### Ben Eater - Learn how to build a computer
+
+The second link was a series of Youtube videos by a guy called Ben Eater about [how to build an 8-bit computer from the ground up](https://www.youtube.com/watch?v=HyznrdDSSGM) with a physical circuit of components.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/HyznrdDSSGM" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
+It's a fairly simple computer, capable of responding to clock signals and basic inputs to add numbers together and other simple operations. For a while I've been looking for an electronics project to try out and I think this could be a perfect project.
+
+### Building NES Games
+
+These two links reminded me of a series of blog posts I stumbled across a while back about [how to make NES games](http://www.retrocollect.com/News/learn-how-to-make-your-own-nintendo-nes-games.html). It takes you from basic concepts like binary through to how to make very simple NES games. The programming language you use is assembly code, which is used to pass instructions to the NES 6502 processor. Previously this had been a bit much to bend my head around but I'm confident I understand more to play around with NES programming now.
+
+Anyway, binary and the logic required to build computers is feeling a lot less daunting after having found these articles.

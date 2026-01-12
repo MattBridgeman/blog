@@ -1,0 +1,15 @@
+---
+title: 'Switching to HTTPS in a lunch break'
+date: '2016-03-10'
+tags: []
+draft: false
+authors: ['default']
+---
+
+This lunchtime I decided to have a go at switching my blog to being served over HTTPS. I've had my eye on [Let's Encrypt](https://letsencrypt.org) for a while. They're a new Certificate Authority dedicated to making it free and easy to encrypt the web. Since they entered public beta in December, I've been looking to make some time to give Let's Encrypt a go and this lunchtime thought I'd see if it were possible make the switch. Following this [helpful tutorial from Digital Ocean](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04) I can happily say this site is now served over encrypted connections!
+
+I found the process of downloading Let's Encrypt and executing it on a Linux server very simple. The most complicated bit was manually configuring my nginx config, but again this wasn't too tricky. In about 20 minutes I had Let's Encrypt verify my domain, issue a single certificate and had my server configured to serve over HTTPS.
+
+Since these HTTPS certificates only stay valid for 90 days you need to renew them fairly regularly and it's generally recommended to update them every 60 days. I therefore also took the tutorial's steps to automate certificate renewal via a cron job on my server.
+
+Let's Encrypt (with a helping hand from Digital Ocean) have made encrypting linux based web servers a lunchtime activity and I for one couldn't be happier.

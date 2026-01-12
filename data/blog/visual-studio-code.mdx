@@ -1,0 +1,25 @@
+---
+title: 'Visual Studio Code'
+date: '2015-07-10'
+tags: []
+draft: false
+authors: ['default']
+---
+
+In the last few days Microsoft released the 0.5.0 preview version of Visual Studio Code, an open source code editor built for Windows, Mac and Linux. Having tried it out at my workplace and on home projects I can officially say I'm a convert.
+
+I (and I'm sure many other front end web developers) have been using Sublime as my de facto standard code editor for a long while now. Before then I used Eclipse IDE and prior to that Visual Studio 2008. Dreamweaver came before that but we won't go there. At the time I worked in environments with Java / .NET developers for which these editors provide incredible tooling. Intellisense, easy refactoring, debugging and build integration come out of the box. But with great tooling comes great cost.
+
+Both Eclipse and Visual Studio are incredibly bloated with features that span far too many technology stacks. They take up a large amount of disk space, take minutes to load and, in the case of Visual Studio, come with a hefty price tag and only run on one operating system, ruling out anything other that professional use cases.
+
+It was for these reasons I was drawn in by Sublime. It's lightweight at only ~50mb, it's free to evaluate, is cross platform and comes with a very minimal feature set with a plugin architecture that allows for extensibility as you see fit. 
+
+The one downside I've found over the years with Sublime is that in stark contrast to Eclipse and Visual Studio, the tooling in Sublime was and is not very mature. At its heart, Sublime and many other front end code editors are essentially rich text editors and in my experience, none have struck the right balance between simplicity and truly useful JavaScript debugging capabilities. For me, Visual Studio Code strikes that balance beautifully.
+
+JavaScript debugging is made possible in Code via its impressive Typescript integration. By default Typescript is switched on in VS Code for all of your JavaScript. You might ask if there are benefits to running Typescript against regular JS code and the answer is yes! Type inference can be hugely helpful in discovering incorrect uses of methods, objects etc, especially in code paths which may only occasionally be reached making debugging difficult. Sprinkling Typescript type declarations on top gives Typescript an even clearer understanding of your JavaScript. Using this knowledge Code adds intellisense for code completion and property glossaries, method definition look ups and 'peek' views making it much easier to traverse and change large Javascript codebases.
+
+Code also gets the little things right. For me an immediate benefit of switching to Code is that it distills the best parts of what I've come to know and love with Sublime. You get syntax support for all common front end languages, support for LESS, SASS, CSS code hints, hex / rgb colour recognition, multi-cursor for editing multiple lines at a time and Emmet to help write HTML quickly. If you've become accustomed to Sublime, your muscle memory automatically picks up these techniques that have become second nature and productivity doesn't dip as it so often does whilst you get used to a new editor.
+
+On top of this you get great git integration, with automatic change notifications from your remote origin, as well as easy commit and push in one step. The UI on the whole is incredibly simple with the most useful features (file browsing, search, git and debugging) exposed as tabs on the left hand side. Toggling between these features becomes very intuitive. For example a common workflow for me is searching for the use of a CSS selector in the search tab, making changes in the code tab, then committing them in the git tab.
+
+For me this is one of the first IDEs to really hit the nail on the head for serving the needs of web developers. It's cross platform, free and whilst it still comes with a preview release tag, Code has a very polished finish to it. I couldn't recommend it highly enough and I'm really hoping the fact that it's made by Microsoft won't put off Mac / Linux centric developers.

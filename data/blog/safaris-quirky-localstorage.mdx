@@ -1,0 +1,17 @@
+---
+title: "Safari's quirky localStorage implementation"
+date: '2015-04-27'
+tags: []
+draft: false
+authors: ['default']
+---
+
+One of the more quirky issues I came across recently when browser testing is how Safari handles localStorage when in private mode. localStorage is a fairly simple API with only a few methods (getItem, setItem and removeItem) and is implemented all the way back to IE8 so it's a convenient way of persisting small amounts of information on a user's browsers.
+
+Now for whatever reasoning Safari has decided that, when in private mode, you cannot access or set items to local storage. However rather than removing 'localStorage' from the window object all together they make getItem calls return null (slightly strange but fair enough) and all setItem calls return and error 'maximum quota exceeded' (WTF?!).
+
+Now the first question I (and I'm sure others) would ask is "who on earth is using private mode in Safari other than to buy their partner a wedding ring?". However, as it transpired, many people around the office had private enabled all the time. Whilst I could be suspicious, it transpires that it's fairly easy to accidentally turn private mode on and the only indication your phone is in that mode is that the URL bar is black instead of white.
+
+Given that it's a valid use case the fix we put in place for the issue was fairly trivial. We already had a local storage abstraction that wraps calls to get and set items so we also added a feature support test which checks if localStorage exists and if setting an item throws an error. If the test fails we fall back to a cookie based implementation.
+
+It's clearly by design that Safari does not allow you to use localStorage, however why a more sane approach (such as removing localStorage entirely from the window object) wasn't adopted I guess will remain a mystery.

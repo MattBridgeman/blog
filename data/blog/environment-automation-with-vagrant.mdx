@@ -1,0 +1,41 @@
+---
+title: 'Environment automation with Vagrant'
+date: '2015-06-04'
+tags: []
+draft: false
+authors: ['default']
+---
+
+It's recently come to light that I don't have an easy way of reproducing the live server environment for mattbridgeman.co.uk: Vagrant to the rescue!
+
+Don't fancy reading all? Here's [the gist](https://gist.github.com/MattBridgeman/1e482331b13f235f02b5) with my vagrant scripts!
+
+### Background
+
+I have an Ubuntu server on Digital Ocean that hosts my personal site. It's set up with nginx, varnish along with the the standard php, MySQL server, php fpm and some other bits and pieces. The configuration has built up over time and now includes things like gzipping and cache headers for static resources.
+
+I'm planning making some server configuration changes, adding some new Linux packages and I want these changes to be as risk free as possible. The ultimate goal is to avoid downtime caused by technical hurdles and problems with experimentation. This lead me to try manually setting up an Ubuntu box.
+
+### Doing it manually
+
+I set about recreating the Ubuntu vm locally on my Mac and about 2 hours later I had a mirrored environment. I also spend spare time at work tinkering with this sort of stuff and wanted to set up a similar vm there but was instantly worried about the need for a similar time investment.
+
+I was also worried about a general issue I could see moving forwards: anytime I want to set up a similar environment, there is a huge time investment to be made with no guarantee the environment will be the same.
+
+### VM Snapshots
+
+Initially I thought vm snapshots could help. If I simply install everything I need then create a snapshot, i would have a solid base for reproducing my environment. Whilst this solves part of the problem, the issue remains that overtime if I build sites upon these snapshots and then want to say install extra packages whilst still having a reproducible base, this becomes challenging as new snapshots would also contain static files such as my site code base.
+
+### Here's where vagrant comes in
+
+I had heard of vagrant in the past but hadn't seen the merit in using it in contexts other than large teams. Only now that I need a simple way to keep multiple virtual environments in sync quickly do I truly see the benefit of it.
+
+Vagrant has a number of barebones VMs that you can download from their server. Everything in vagrant happens via the vagrant file which is a configurable file that acts as a way of generating your environment. It allows you to add shell scripts to automate tasks like installing php, configuring nginx etc.
+
+### Trial and error
+
+As my server configuration has a good number of steps in it, some of which are interactive e.g. entering passwords twice, it was a challenge to get my install and set up script right. Luckily another place Vagrant comes into its own is its simple command line functions such as `vagrant up` and `vagrant destroy` which let you quickly set up and tear down environments. If a step went wrong, I'd identify how to fix the command, update my shell script then tear down and create a fresh instance of my environment. After a period of trial and error I'm now capable of reproducing my live server environment with a single command.
+
+### Conclusions
+
+For me Vagrant's key feature is that it encourages the best practice of explicitly defining your server set up as a series of scripts, rather than making changes manually. The bonus is it doubles as a spec for future reference so no longer do you loose track of the configuration changes you make over time.

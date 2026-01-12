@@ -1,0 +1,156 @@
+---
+title: 'Experimenting with Service Workers'
+date: '2018-04-11'
+tags: ['front end', 'service workers', 'offline']
+draft: false
+authors: ['default']
+---
+
+Following up on my last post [Taking the Web Offline](/blog/taking-the-web-offline), I've been experimenting with Service Workers to create an offline experience for this website. Hopefully if you're using a browser with Service Workers enabled, you should now be able to view the home page and any blog posts you visit offline. I thought I'd share some of my thoughts on Service Workers so far, but if you're looking for more high level information on what they are, [Google's Web Fundamentals](https://developers.google.com/web/fundamentals/primers/service-workers/) is a great place to start.
+
+### Service Worker Life Cycle
+
+There are a number of phases that a Service Worker goes through before it's ready to take over network requests.
+
+<Figure 
+  src="/static/images/posts/service-workers/sw-workflow.svg"
+  alt="Service Worker Life Cycle"
+  caption="The Service Worker Life Cycle" />
+
+When you hit a page that registers a Service Worker, an install event is triggered. This is an opportunity to download all static assets, that don't regularly update, so they are ready to serve when a user is offline. Here's what my install step currently looks like:
+
+``` javascript
+const version = '0.0.1';
+const cachePrefix = 'mattbridgeman-';
+const staticCacheName = `${cachePrefix}static-${version}`;
+
+addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(staticCacheName);
+    await cache.addAll([
+      '/',
+      `/css/main.css?bust=${version}`,
+      `/js/main.js?bust=${version}`,
+      '/img/icon.png',
+      '/img/me-2.jpg',
+      'img/icons/tick.svg',
+      'img/icons/close.svg',
+      '/offline.html',
+      'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400'
+    ]);
+    self.skipWaiting();
+  })());
+});
+```
+
+If the install phase executes without error, your Service Worker will become active when the page network activity goes idle. Once it's active it can intercept network requests using the fetch event listener.
+
+``` javascript
+addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(r => r || fetch(event.request))
+  );
+});
+```
+
+Above every web request your page makes, even requests to third party domains, pass through fetch. It's a nice feature as it means that assets from 3rd parties with cross origin headers can be cached. I use the google font "Source Sans Pro" as the main site font. Using Service Workers, I can therefore cache the font css file and any requests made to `fonts.gstatic.com` and make them available offline.
+
+``` javascript
+addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  if (url.host == 'fonts.gstatic.com') {
+    event.respondWith(handleFontRequest(event.request));
+    return;
+  }
+  ...
+});
+
+async function handleFontRequest(request) {
+  const match = await caches.match(request);
+  if (match) return match;
+
+  const promises = await Promise.all([
+    await fetch(request),
+    await caches.open(fontCacheName)
+  ]);
+  const [response, fontCache] = promises;
+  fontCache.put(request, response.clone());
+  return response;
+}
+```
+
+Above you can see that every asset from the `fonts.gstatic.com` domain is requested, then stored in a separate cache and returned to the browser. This shows just how granular Service Workers let you get when deciding how to handle requests.
+
+### Dynamic content
+
+By far the biggest challenge I've seen when setting up my Service Worker was what to do with dynamic content from the `/blog/` section. There are lots of different caching strategies I could choose from:
+
+**Cache first** - Retrieve from the cache, if there is no cache entry, go to the network. This is best for speed but will mean users will see content that is out of date if the cache is never updated.
+
+**Network first** - Always go to the network first. Fallback to cache if that fails (e.g. when no internet connection). Content will always be up to date but if you have a slow connection this can be slow as the network request could take seconds or minutes to return.
+
+**Network and cache race** - Try both and see which returns a result quickest.
+
+In the end I've chosen the "cache first" approach with the caveat being that I have a Service Worker cache version number which I can increment if I wish to invalidate the old caches. When I do this my activate step deletes any cache which doesn't match the current version number.
+
+``` javascript
+addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    // remove caches beginning "mattbridgeman-" that aren't in expectedCaches
+    for (const cacheName of await caches.keys()) {
+      if (!cacheName.startsWith(cachePrefix)) continue;
+      if (!expectedCaches.includes(cacheName)) await caches.delete(cacheName);
+    }
+
+    await storage.set('active-version', version);
+  })());
+});
+```
+
+The benefit to this approach is that I always have a means to clear old cache content. However it does mean that there could be perfectly valid cached posts that get deleted in this process. There's therefore another approach that I'm thinking of trying out:
+
+### Cache first with a background update
+
+If you go to the cache when someone visits a page you will return a result quickly. Then concurrently you can request the page again in the Service Worker. If you successfully get the page back you can cache it and inform the user that there's an update. Users may see out of date content for one return visit but after that they will be back up to date.
+
+### Notifying Users
+
+In my [last post](/blog/taking-the-web-offline) I came to the opinion that, as developers, we need to prompt users of when websites will work offline. To tackle this I created a notification bar for displaying messages.
+
+<Figure 
+  src="/static/images/posts/service-workers/ready-to-work-offline.png" />
+
+When you visit the site for the first time on a browser with Service Workers, you'll see the above. The code for figuring out when a service worker becomes active is pretty simple:
+
+``` javascript
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js', {
+    scope: '/'
+  }).then(function(registration) {
+    registration.addEventListener('updatefound', function(){
+      const newWorker = registration.installing;
+      
+      newWorker.addEventListener('statechange', function() {
+
+        // the very first activation!
+        // tell the user stuff works offline
+        if(newWorker.state == 'activated') {
+          if(!navigator.serviceWorker.controller) {
+            //code to display 'ready to work offline' message
+            return;
+          }
+        }
+      });
+    });
+  });
+}
+```
+
+Service Workers have a "state change" event, which you can listen to on the front-end of the site. By nesting this listener inside an "update found" event you can determine when a new Service Worker has been activated. I found this approach inside of Jake Archibald's [SVGOMG](https://github.com/jakearchibald/svgomg) project, a great example of a Service Worker driven app.
+
+### Tweaks, tweaks, tweaks...
+
+My key takeaway so far from Service Workers is that they give you a huge level of granularity for caching and serving content. One improvement I want to make to this site is offline image caching. Currently images from posts etc always go to the network. In the future I'd like to dynamically cache images from visited posts.
+
+If you're a developer, I'd highly recommend trying out Service Workers if you haven't already.
