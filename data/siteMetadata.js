@@ -11,7 +11,7 @@ const siteMetadata = {
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.png`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
   mastodon: 'https://mastodon.social/@mastodonuser',
-  email: 'matt_bridgeman@hotmail.co.uk',
+  email: '',
   github: 'https://github.com/MattBridgeman',
   x: 'https://twitter.com/matt_bridgeman',
   // twitter: 'https://twitter.com/matt_bridgeman',
